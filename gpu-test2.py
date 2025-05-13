@@ -1,7 +1,7 @@
 import os
 from outlines import models, generate
 from pydantic import BaseModel, ValidationError
-from transformers import VisionEncoderDecoderModel, AutoProcessor
+from transformers import BlipForConditionalGeneration, AutoProcessor
 from PIL import Image
 import json
 
@@ -19,7 +19,7 @@ class DocumentData(BaseModel):
 try:
     model = models.transformers_vision(
         "Salesforce/blip2-opt-2.7b",
-        model_class=VisionEncoderDecoderModel,
+        model_class=BlipForConditionalGeneration,
         device="cuda"
     )
     print("Model loaded successfully.")
