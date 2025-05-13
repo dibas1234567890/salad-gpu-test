@@ -17,7 +17,7 @@ class ImageDescription(BaseModel):
 
 # Load BLIP model
 try:
-    model = models.transformers(
+    model = models.transformers_vision(
         "Salesforce/blip2-opt-2.7b",
         model_class=Blip2ForConditionalGeneration,
         device=device,
