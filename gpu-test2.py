@@ -1,7 +1,7 @@
 import os
 from outlines import models, generate
 from pydantic import BaseModel, ValidationError
-from transformers import BlipForConditionalGeneration, BlipProcessor
+from transformers import Blip2ForConditionalGeneration, Blip2Processor
 from PIL import Image
 import json
 import torch
@@ -19,7 +19,7 @@ class ImageDescription(BaseModel):
 try:
     model = models.transformers(
         "Salesforce/blip2-opt-2.7b",
-        model_class=BlipForConditionalGeneration,
+        model_class=Blip2ForConditionalGeneration,
         device=device,
     )
     print("Model loaded successfully.")
@@ -29,7 +29,7 @@ except Exception as e:
 
 # Load BLIP Processor
 try:
-    processor = BlipProcessor.from_pretrained("Salesforce/blip2-opt-2.7b")
+    processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
     print("Processor loaded successfully.")
 except Exception as e:
     print(f"Error loading processor: {e}")
