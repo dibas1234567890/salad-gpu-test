@@ -1,35 +1,37 @@
 import os
 from outlines import models, generate
 from pydantic import BaseModel, ValidationError
-from transformers import BlipForConditionalGeneration, AutoProcessor
+from transformers import BlipForConditionalGeneration, BlipProcessor
 from PIL import Image
 import json
+import torch
 
 # Ensure CUDA is enabled and appropriate memory settings are applied
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 os.environ['TORCH_USE_CUDA_DSA'] = "1"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Define the data schema using Pydantic
-class DocumentData(BaseModel):
-    name: str
-    last_name: str
-    id: int
+class ImageDescription(BaseModel):
+    description: str
 
-# Load Donut model
+# Load BLIP model
 try:
-    model = models.transformers_vision(
+    model = models.transformers(
         "Salesforce/blip2-opt-2.7b",
         model_class=BlipForConditionalGeneration,
-        device="cuda"
+        device=device,
+        dtype="float16" if device == "cuda" else "float32",
+        trust_remote_code=True
     )
     print("Model loaded successfully.")
 except Exception as e:
     print(f"Error loading model: {e}")
     exit()
 
-# Load Processor
+# Load BLIP Processor
 try:
-    processor = AutoProcessor.from_pretrained("naver-clova-ix/donut-base")
+    processor = BlipProcessor.from_pretrained("Salesforce/blip2-opt-2.7b")
     print("Processor loaded successfully.")
 except Exception as e:
     print(f"Error loading processor: {e}")
@@ -37,14 +39,14 @@ except Exception as e:
 
 # Initialize the generator
 try:
-    generator = generate.json(model, DocumentData)
+    generator = generate.json(model, ImageDescription)
     print("Generator initialized successfully.")
 except Exception as e:
     print(f"Error initializing generator: {e}")
     exit()
 
 # Define the image path (Replace with your image path)
-image_path = "page_7.jpg"
+image_path = "sample_image.jpg"
 
 # Load the image
 try:
@@ -56,15 +58,10 @@ except Exception as e:
 
 # Generate output
 try:
-    # Define the structured prompt for JSON output
+    # Define the prompt for conditional generation
     prompt = """
-    Extract the following information as a JSON object:
-    {
-        "name": "User's full name",
-        "last_name": "User's last name",
-        "id": "A numeric identifier"
-    }
-    Ensure the output is a valid JSON object.
+    Describe the content of the image in a single sentence. 
+    Return the response as a JSON object with the key "description".
     """
 
     # Generate output using the image
@@ -79,7 +76,7 @@ try:
     # Attempt to parse the output as JSON
     try:
         # Validate against the schema
-        result = DocumentData.parse_raw(output)
+        result = ImageDescription.parse_raw(output)
         print("Parsed Result:", result)
     except ValidationError as ve:
         print(f"Validation Error: {ve}")
