@@ -17,7 +17,7 @@ class DocumentData(BaseModel):
 
 # Load Donut model
 try:
-    model = models.transformers(
+    model = models.transformers_vision(
         "naver-clova-ix/donut-base",
         model_class=VisionEncoderDecoderModel,
         device="cuda"
