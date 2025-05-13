@@ -17,9 +17,6 @@ class User(BaseModel):
 try:
     model = models.transformers(
         "google/gemma-3-4b-it",
-        model_class=AutoModelForCausalLM,
-        dtype="float16", 
-        trust_remote_code=True,
         device="cuda"
     )
     print("Model loaded successfully.")
