@@ -3,6 +3,7 @@ from outlines import models, generate
 from pydantic import BaseModel, ValidationError
 from transformers import VisionEncoderDecoderModel, AutoProcessor
 from PIL import Image
+import json
 
 # Ensure CUDA is enabled and appropriate memory settings are applied
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
@@ -16,10 +17,10 @@ class DocumentData(BaseModel):
 
 # Load Donut model
 try:
-    model = models.transformers_vision(
+    model = models.transformers(
         "naver-clova-ix/donut-base",
         model_class=VisionEncoderDecoderModel,
-        device="cuda",
+        device="cuda"
     )
     print("Model loaded successfully.")
 except Exception as e:
@@ -55,13 +56,37 @@ except Exception as e:
 
 # Generate output
 try:
+    # Define the structured prompt for JSON output
+    prompt = """
+    Extract the following information as a JSON object:
+    {
+        "name": "User's full name",
+        "last_name": "User's last name",
+        "id": "A numeric identifier"
+    }
+    Ensure the output is a valid JSON object.
+    """
+
     # Generate output using the image
-    result = generator(
-        "Extract name, last_name, and id from the document",
+    output = generator(
+        prompt,
         media=[image]
     )
-    print("Generated Result:", result)
-except ValidationError as e:
-    print(f"Validation Error: {e}")
+
+    # Inspect raw output
+    print("Raw Output:", output)
+
+    # Attempt to parse the output as JSON
+    try:
+        # Validate against the schema
+        result = DocumentData.parse_raw(output)
+        print("Parsed Result:", result)
+    except ValidationError as ve:
+        print(f"Validation Error: {ve}")
+    except json.JSONDecodeError as je:
+        print(f"JSON Decode Error: {je}")
+    except Exception as e:
+        print(f"Unexpected Error during JSON parsing: {e}")
+
 except Exception as e:
     print(f"Error during generation: {e}")
