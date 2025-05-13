@@ -44,7 +44,7 @@ except Exception as e:
     exit()
 
 # Define the image path (Replace with your image path)
-image_path = "sample_image.jpg"
+image_path = "page_7.jpg"
 
 # Load the image
 try:
