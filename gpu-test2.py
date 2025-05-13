@@ -18,6 +18,7 @@ class DocumentData(BaseModel):
 try:
     model = models.transformers_vision(
         "naver-clova-ix/donut-base",
+        model_class=VisionEncoderDecoderModel,
         device="cuda",
     )
     print("Model loaded successfully.")
