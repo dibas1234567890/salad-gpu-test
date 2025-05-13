@@ -18,7 +18,7 @@ class DocumentData(BaseModel):
 # Load Donut model
 try:
     model = models.transformers_vision(
-        "naver-clova-ix/donut-base",
+        "Salesforce/blip2-opt-2.7b",
         model_class=VisionEncoderDecoderModel,
         device="cuda"
     )
