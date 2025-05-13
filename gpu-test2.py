@@ -21,7 +21,6 @@ try:
         "Salesforce/blip2-opt-2.7b",
         model_class=BlipForConditionalGeneration,
         device=device,
-        dtype="float16" if device == "cuda" else "float32",
         trust_remote_code=True
     )
     print("Model loaded successfully.")
