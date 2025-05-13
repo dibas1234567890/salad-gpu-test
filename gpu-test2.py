@@ -21,7 +21,6 @@ try:
         "Salesforce/blip2-opt-2.7b",
         model_class=BlipForConditionalGeneration,
         device=device,
-        trust_remote_code=True
     )
     print("Model loaded successfully.")
 except Exception as e:
